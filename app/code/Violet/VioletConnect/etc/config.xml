@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Store/etc/config.xsd">
+    <default>
+        <payment>
+                <violet>
+                <active>1</active>
+                <title>Violet</title>
+                <order_status>pending_payment</order_status>
+                <instructions>Instruction.</instructions>
+                <payment_action>true</payment_action>
+                <can_use_checkout>0</can_use_checkout>
+                <model>Violet\VioletConnect\Model\Violet</model>
+                <group>offline</group>
+            </violet>
+            <!-- payment-config -->
+        </payment>
+    </default>
+</config>

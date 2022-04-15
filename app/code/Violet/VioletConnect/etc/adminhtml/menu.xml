@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../Magento/Backend/etc/menu.xsd">
+    <menu>
+        <add id="Violet_VioletConnect::parent" title="Violet" module="Violet_VioletConnect" sortOrder="100" resource="Violet_VioletConnect::parent"/>
+        <add id="Violet_VioletConnect::index" title="Sync Products" module="Violet_VioletConnect" sortOrder="10" action="violetconnect/index" resource="Violet_VioletConnect::index" parent="Violet_VioletConnect::parent"/>
+        <add id="Violet_VioletConnect::createapiuser" title="Manage API User" module="Violet_VioletConnect" sortOrder="11" action="violetconnect/createapiuser" resource="Violet_VioletConnect::createapiuser" parent="Violet_VioletConnect::parent"/>
+    </menu>
+</config>

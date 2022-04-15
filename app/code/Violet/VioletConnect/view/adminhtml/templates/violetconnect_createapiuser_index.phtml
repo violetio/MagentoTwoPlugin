@@ -1,0 +1,45 @@
+<div class="violet-content">
+  <div>
+    To access product data and persist orders back into your Magento store Violet requires an API User for Violet use only.
+  </div>
+  <div>
+    <form id="form-manage-apiuser" action="<?php echo $block->getAction() ?>" method="POST">
+      <input name="form_key" type="hidden" value="<?php /* @escapeNotVerified */ echo $block->getFormKey() ?>" />
+      <?php if (!$block->integrationExists()) : ?>
+      <button id="violet-submit-btn" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" type="submit">
+        <span class="ui-button-text">
+          <span>Create API User</span>
+        </span>
+      </button>
+      <?php else : ?>
+        <button id="violet-submit-btn" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" type="submit">
+          <span class="ui-button-text">
+            <span>Refresh API User</span>
+          </span>
+        </button>
+      <?php endif; ?>
+    </form>
+  </div>
+</div>
+<style>
+    div.violet-content > div {
+        margin-bottom: 15px;
+    }
+</style>
+<script>
+require([
+    "jquery"
+], function($){
+    $('#form-manage-apiuser').submit(function(e){
+        $('#violet-submit-btn').prop('disabled', true);
+        $('#violet-submit-btn span span').text('Processing...');
+        e.preventDefault();
+        $.ajax({
+            url: e.originalEvent.srcElement.action,
+            type:'post'
+        }).done(function(m) {
+            location.reload();
+        });
+    });
+});
+</script>

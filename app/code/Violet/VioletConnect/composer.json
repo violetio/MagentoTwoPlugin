@@ -1,0 +1,31 @@
+{
+    "name": "violet/violetconnect",
+    "description": "Magento 2 module for connecting your store to Violet.",
+    "require": {},
+    "keywords": [
+        "omnichannel",
+        "distribution"
+    ],
+    "type": "magento2-module",
+    "version": "1.0.6",
+    "license": [
+        "OSL-3.0",
+        "AFL-3.0"
+    ],
+    "authors": [
+        {
+            "name": "Rhen Zabel",
+            "email": "rhen@violet.io",
+            "homepage": "https://violet.io",
+            "role": "lead"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Violet\\VioletConnect\\": ""
+        },
+        "files": [
+            "registration.php"
+        ]
+    }
+}

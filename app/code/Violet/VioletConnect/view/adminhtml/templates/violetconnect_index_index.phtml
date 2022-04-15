@@ -1,0 +1,39 @@
+<div class="violet-content">
+  <div>
+    Sync your products to add them to the Violet product catalog.
+  </div>
+  <div>
+    <form id="form-sync-products" action="<?php echo $block->getAction() ?>" method="POST">
+      <input name="form_key" type="hidden" value="<?php /* @escapeNotVerified */ echo $block->getFormKey() ?>" />
+      <button id="violet-submit-btn" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" type="submit">
+        <span class="ui-button-text">
+          <span>Sync Products</span>
+        </span>
+      </button>
+    </form>
+  </div>
+</div>
+<style>
+    div.violet-content > div {
+        margin-bottom: 15px;
+    }
+</style>
+<script>
+require([
+    "jquery"
+], function($){
+    $('#form-sync-products').submit(function(e){
+        $('#violet-submit-btn').prop('disabled', true);
+        $('#violet-submit-btn span span').text('Syncing...');
+        e.preventDefault();
+        $.ajax({
+            url: e.originalEvent.srcElement.action,
+            type:'post'
+        }).done(function(m) {
+            // $('#violet-submit-btn span span').text('Sync Products');
+            // $('#violet-submit-btn').prop('disabled', false);
+            location.reload();
+        });
+    });
+});
+</script>

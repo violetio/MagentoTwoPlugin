@@ -1,0 +1,14 @@
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="violetconnect" engine="innodb" comment="Violet Table">
+        <column xsi:type="int" name="id" unsigned="true" nullable="false" identity="true"/>
+        <column xsi:type="boolean" name="api_user_created" nullable="false" default="false"/>
+        <column xsi:type="smallint" name="configuration_state" nullable="false" default="1"/>
+        <column xsi:type="text" name="token" nullable="true"/>
+        <column xsi:type="bigint" name="merchant_id" nullable="true"/>
+        <column xsi:type="datetime" name="last_catalog_sync_date" nullable="true"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+    </table>
+</schema>

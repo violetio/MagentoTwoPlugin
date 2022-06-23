@@ -49,7 +49,7 @@ class InitProductSync extends \Magento\Framework\App\Action\Action implements Ht
     }
 
   /**
-   * Create new Integration
+   * Initialize Product Sync
    */
     private function initProductSync()
     {

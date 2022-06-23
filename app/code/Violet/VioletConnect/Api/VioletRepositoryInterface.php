@@ -3,11 +3,11 @@ namespace Violet\VioletConnect\Api;
 
 /**
  * Interface WebServiceRepositoryInterface
- * @package Violet\VioletConnect\Api
  */
 interface VioletRepositoryInterface
 {
     /**
+     * 
      * @param string $token
      * @param int $merchantId
      *
@@ -22,6 +22,7 @@ interface VioletRepositoryInterface
     public function skuCount();
 
     /**
+     * 
      * @param int $page
      * @param int $pageSize
      *
@@ -30,6 +31,7 @@ interface VioletRepositoryInterface
     public function skus($page, $pageSize);
 
     /**
+     * 
      * @param string $sku
      *
      * @return Magento\Catalog\Api\Data\ProductInterface[]

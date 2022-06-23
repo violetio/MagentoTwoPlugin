@@ -1,0 +1,15 @@
+{
+    "violetconnect": {
+        "column": {
+            "id": true,
+            "api_user_created": true,
+            "configuration_state": true,
+            "token": true,
+            "merchant_id": true,
+            "last_catalog_sync_date": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    }
+}

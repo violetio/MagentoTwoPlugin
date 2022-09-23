@@ -22,13 +22,24 @@ class Index extends \Magento\Backend\Block\Widget\Container
 
     public function integrationExists()
     {
+        return (!empty($this->getExistingIntegration()));
+    }
+
+    public function getToken() 
+    {
+        $existingIntegration = $this->getExistingIntegration();
+        $token = $objectManager->get('Magento\Integration\Model\Oauth\Token');
+        $token->loadByConsumerIdAndUserType($existingIntegration['consumer_id'], 1);
+        return $token;
+    }
+
+    private function getExistingIntegration()
+    {
         $bootstrap = Bootstrap::create(BP, $_SERVER);
         $objectManager = $bootstrap->getObjectManager();
-        $integrationExists = $objectManager->get('Magento\Integration\Model\IntegrationFactory')
+        $existingIntegration = $objectManager->get('Magento\Integration\Model\IntegrationFactory')
         ->create()->load($this->integrationName, 'name')->getData();
-
-        $this->logger->info(!empty($integrationExists));
-        return (!empty($integrationExists));
+        return $existingIntegration;
     }
 
     public function getAction()

@@ -2,6 +2,7 @@
 namespace Violet\VioletConnect\Observer;
 
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Sales\Api\Data\ShipmentItemInterface;
 
 /**
  * Violet After Shipment Save Event
@@ -15,48 +16,31 @@ class ShipmentSaveAfter implements ObserverInterface
 
     private $logger;
     private $vClient;
-    private $trackCollection;
 
     public function __construct(
         \Psr\Log\LoggerInterface $logger,
-        \Violet\VioletConnect\Helper\Client $vClient,
-        \Magento\Sales\Model\ResourceModel\Order\Shipment\Track\Collection $trackCollection
+        \Violet\VioletConnect\Helper\Client $vClient
     ) {
         $this->logger = $logger;
         $this->vClient = $vClient;
-        $this->trackCollection = $trackCollection;
     }
 
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
         try {
-            $event = $observer->getEvent();
-            $shipment = $event->getShipment();
+            $shipment = $observer->getEvent()->getShipment();
             $order = $shipment->getOrder();
+
+            // escape if no order
             if ($order == null) return;
-            $trackingId = null;
-            $carrierName = null;
+            // escape if not a violet order
+            $payment = $order->getPayment();
+            if ($payment != null && $payment->getMethod() != 'violet') return;
 
-            $shipmentTracksCollection = $shipment->getTracksCollection()
-            ->setPageSize(1, 1);
-
-            if (!empty($shipmentTracksCollection)) {
-                $track = $shipmentTracksCollection->getLastItem();
-                $trackingId = $track->getTrackNumber();
-                $carrierName = $track->getTitle();
-            }
-
-            foreach ($order->getAllItems() as $item) {
-              $product = $item->getProduct();
-              $qty = $product->getQuantityAndStockStatus()['qty'];
-              $this->vClient->qtyUpdated($product->getSku(), $qty);
-            }
-
-            $orderId = $order->getEntityId();
-
-            $this->vClient->orderShipped($orderId, $trackingId, $carrierName);
+            // notify violet of refund
+            $this->vClient->orderShipped($order->getEntityId());
         } catch (\Exception $e) {
-          $this->logger->info("Error notifying Violet of shipment: " . $e->getMessage());
+            $this->logger->info("Error notifying Violet of shipment: " . $e->getMessage());
         }
     }
 }

@@ -32,16 +32,14 @@ class StockItemSaveAfter implements ObserverInterface
         try {
             $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
             $item = $observer->getEvent()->getItem();
-
             if ($item !== null && $item->getTypeId() != "configurable") {
                 $product = $this->productRepository->getById($item->getitemId());
-                if ($product !== null && $product->hasData('quantity_and_stock_status')) {
-                    $qty = $product->getData('quantity_and_stock_status')['qty'];
-                    $this->vClient->qtyUpdated($product->getSku(), $qty);
+                if ($product !== null) {
+                    $this->vClient->productUpdated($product->getSku());
                 }
             }
         } catch (\Exception $e) {
-            $this->logger->info("Error notifying Violet of quanity update.");
+            $this->logger->info("Error notifying Violet of quanity update in stock item save after: " . $e->getMessage());
         }
     }
 }

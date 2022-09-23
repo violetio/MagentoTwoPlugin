@@ -25,16 +25,8 @@ class Client extends AbstractHelper
     private $violetEntityFactory;
     private $curl;
 
-    const LOGIN_ENDPOINT = "login";
-    const INIT_PRODUCT_SYNC_ENDPOINT = "sync/merchants/%s/products";
-    const SYNC_PRODUCTS_ENDPOINT = "sync/merchants/%s/external/magento/2/products";
-    const SYNC_SKUS_ENDPOINT = "sync/merchants/%s/external/magento/2/skus";
-    const UPDATE_ORDER_ENDPOINT = "sync/merchants/%s/external/magento/2/order";
-    const ORDER_SHIPPED_ENDPOINT = "sync/merchants/%s/external/magento/orders/%s/shipped";
-    const ORDER_CANCELED_ENDPOINT = "sync/merchants/%s/external/magento/orders/%s/canceled";
-    const ORDER_REFUNDED_ENDPOINT = "sync/merchants/%s/external/magento/orders/%s/refunded";
-    const UPDATE_QTY_ENDPOINT = "sync/merchants/%s/external/magento/skus/qty";
-    const SET_CREDENTIALS_ENDPOINT = "sync/merchants/%s/external/magento/credentials";
+    const PRODUCT_EVENT_ENDPOINT = "sync/external/events/magento/product";
+    const ORDER_EVENT_ENDPOINT = "sync/external/events/magento/order";
 
     public function __construct(
         \Psr\Log\LoggerInterface $logger,
@@ -52,173 +44,49 @@ class Client extends AbstractHelper
         $this->violetEntityFactory = $violetEntityFactory;
     }
 
+ 
   /**
-   * Login
-   * - creates a Violet Session
+   * Product Updated
+   * @param externalId
    */
-    public function login()
-    {
-        // retrieve credentials from config
-        $violetUsername = $this->scopeConfig->getValue(
-            'violet/general/violet_username',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        );
-        $violetPassword = $this->scopeConfig->getValue(
-            'violet/general/violet_password',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        );
-        $violetSectionUrl = $this->urlBuilder->getUrl('adminhtml/system_config/edit/section/violet');
+  public function productUpdated($externalId)
+  {
+      $url = $this->getApiPath() . self::PRODUCT_EVENT_ENDPOINT;
+      $headers = self::assembleRequestHeaders();
 
-        if ($violetUsername === null || $violetPassword === null) {
-            // $this->messageManager->addWarning(__(
-            //     "Your Violet credentials have not been added.
-            //     Please <a href='".$violetSectionUrl."'>add these</a> before continuing."
-            // ));
-            // log this failure
-            $this->logger->info("Violet credentials have not been set.");
-            return;
-        }
+      $requestBody = json_encode([
+        "entity_id" => $externalId,
+        "entity_type" => "PRODUCT",
+        "event_type" => "PRODUCT_UPDATED"
+      ]);
 
-        // build request body
-        $loginBody = json_encode([
-        "username" => $violetUsername,
-        "password" => $this->encryptor->decrypt($violetPassword)
-        ]);
+      $headers[] = 'X-Violet-Hmac-Sha256: ' . $this->signRequest($requestBody);
 
-        // public app secret for Magento Requests only. Invalidates against other API services
-        $headers = ["Content-Type: application/json", "X-Violet-App-Id: -1"];
-
-        // make request
-        $requestUrl = $this->getApiPath() . self::LOGIN_ENDPOINT;
-        $loginRequest = $this->makeRequest("POST", $requestUrl, $loginBody, $headers);
-
-        // handle response
-        $httpCode = $this->getResponseHeader("http_code");
-        if (strpos($httpCode, '200') !== false) {
-            $this->vToken = $this->getResponseHeader("Authorization");
-            $responseBody = json_decode($loginRequest);
-
-            $this->merchantId = $responseBody->merchant_id;
-
-            return $responseBody;
-        } else {
-            // $this->messageManager->addWarning(__(
-            //     "Your Violet credentials are invalid.
-            //     Please <a href='".$violetSectionUrl."'>update these</a> before continuing."
-            // ));
-            // log this failure
-            $this->logger->info("Violet Username and/or Password are invalid.
-            Please update your credentials then try again.");
-        }
-    }
+      $request = $this->makeRequest("POST", $url, $requestBody, $headers);
+      return $request;
+  }
 
   /**
-   * Init Product Sync
-   * - initializes magento 2 product sync
+   * Product Deleted
+   * @param externalId
    */
-    public function initProductSync()
-    {
-        try {
-            if ($this->vToken === null) {
-                $user = $this->login();
-                if (!$user) {
-                    throw new \Exception("Could not sign into Violet.", 1001);
-                }
-                $token = $user->token;
-            } else {
-                $token = $this->vToken;
-            }
+  public function productDeleted($externalId)
+  {
+      $url = $this->getApiPath() . self::PRODUCT_EVENT_ENDPOINT;
+      $headers = self::assembleRequestHeaders();
 
-            $url = $this->getApiPath() . sprintf(self::INIT_PRODUCT_SYNC_ENDPOINT, $this->merchantId);
-            $headers = self::assembleRequestHeaders();
-            $headers[] = 'X-Violet-Token: ' . $token;
+      $requestBody = json_encode([
+        "entity_id" => $externalId,
+        "entity_type" => "PRODUCT",
+        "event_type" => "PRODUCT_DELETED"
+      ]);
 
-            $request = $this->makeRequest("POST", $url, null, $headers);
+      $headers[] = 'X-Violet-Hmac-Sha256: ' . $this->signRequest($requestBody);
 
-            $this->messageManager->addSuccess(__(
-                "Products synced successfully!"
-            ));
+      $request = $this->makeRequest("POST", $url, $requestBody, $headers);
+      return $request;
+  }
 
-            return $request;
-        } catch (\Exception $e) {
-            $this->messageManager->addWarning(__(
-                "Products could not be synced. " . $e->getMessage()
-            ));
-        }
-    }
-
-  /**
-   * Sync Products
-   * - syncs products to Violet
-   * @param products
-   */
-    public function syncProducts($products)
-    {
-        try {
-            if ($this->vToken === null) {
-                $this->login();
-            }
-    
-            $url = $this->getApiPath() . sprintf(self::SYNC_PRODUCTS_ENDPOINT, $this->merchantId);
-            $headers = self::assembleRequestHeaders();
-            $requestBody = json_encode($products);
-    
-            $headers[] = 'X-Violet-Hmac-Sha256: ' . $this->signRequest($requestBody);
-    
-            $request = $this->makeRequest("POST", $url, $requestBody, $headers);
-    
-            return $request;
-        } catch (\Exception $e) {
-            $this->logger->info("Product could not be synced. " . $e->getMessage());
-        }
-    }
-
-  /**
-   * Sync Skus
-   * - syncs skus to Violet
-   * @param skus
-   */
-    public function syncSkus($skus)
-    {
-        try {
-            if ($this->vToken === null) {
-                $this->login();
-            }
-    
-            $url = $this->getApiPath() . sprintf(self::SYNC_SKUS_ENDPOINT, $this->merchantId);
-            $headers = self::assembleRequestHeaders();
-            $requestBody = json_encode($skus);
-    
-            $request = $this->makeRequest("POST", $url, $requestBody, $headers);
-    
-            return $request;
-        } catch (\Exception $e) {
-            $this->logger->info("SKU could not be synced. " . $e->getMessage());
-        }
-    }
-
-  /**
-   * Update Order
-   * - update order record
-   * @param order
-   */
-    public function updateOrderRecord($order)
-    {
-        if ($this->vToken === null) {
-            $this->login();
-        }
-
-        $url = $this->getApiPath() . sprintf(self::UPDATE_ORDER_ENDPOINT, $this->merchantId);
-        $headers = self::assembleRequestHeaders();
-
-
-        $requestBody = json_encode($order);
-
-        $headers[] = 'X-Violet-Hmac-Sha256: ' . $this->signRequest($requestBody);
-
-        $request = $this->makeRequest("POST", $url, $requestBody, $headers);
-        return $request;
-    }
 
   /**
    * Order Shipped
@@ -227,161 +95,43 @@ class Client extends AbstractHelper
    * @param trackingId
    * @param carrierName
    */
-    public function orderShipped($externalOrderId, $trackingId, $carrierName)
+    public function orderShipped($externalOrderId)
     {
-        if ($this->vToken === null) {
-            $this->login();
-        }
-
-        $url = $this->getApiPath() . sprintf(self::ORDER_SHIPPED_ENDPOINT, $this->merchantId, $externalOrderId);
+        $url = $this->getApiPath() . self::ORDER_EVENT_ENDPOINT;
         $headers = self::assembleRequestHeaders();
 
         $requestBody = json_encode([
-        "merchant_id" => $this->merchantId,
-        "tracking_id" => $trackingId,
-        "carrier" => $carrierName,
-        'timestamp' => time()
+            "entity_id" => $externalOrderId,
+            "entity_type" => "ORDER",
+            "event_type" => "ORDER_SHIPPED"
         ]);
-
         $headers[] = 'X-Violet-Hmac-Sha256: ' . $this->signRequest($requestBody);
 
         $request = $this->makeRequest("POST", $url, $requestBody, $headers);
         return $request;
     }
 
-  /**
-   * Quantity Updated
-   * - updates qty records
-   * @param externalId
-   * @param qty
-   */
-    public function qtyUpdated($externalId, $qty)
-    {
-        if ($this->vToken === null) {
-            $this->login();
-        }
-        $url = $this->getApiPath() . sprintf(self::UPDATE_QTY_ENDPOINT, $this->merchantId);
-        $headers = self::assembleRequestHeaders();
-
-        $requestBody = json_encode([
-        "external_id" => $externalId,
-        "qty" => $qty
-        ]);
-
-        $headers[] = 'X-Violet-Hmac-Sha256: ' . $this->signRequest($requestBody);
-
-        $request = $this->makeRequest("POST", $url, $requestBody, $headers);
-        return $request;
-    }
-
-  /**
-   * Order Canceled
-   * - flag order as being canceled
-   * @param externalOrderId
-   */
-    public function orderCanceled($externalOrderId)
-    {
-        if ($this->vToken === null) {
-            $this->login();
-        }
-
-        $url = $this->getApiPath() . sprintf(self::ORDER_CANCELED_ENDPOINT, $this->merchantId, $externalOrderId);
-        $headers = self::assembleRequestHeaders();
-
-        $requestBody = json_encode([
-        "merchant_id" => $this->merchantId,
-        "order_id" => $externalOrderId
-        ]);
-
-        $headers[] = 'X-Violet-Hmac-Sha256: ' . $this->signRequest($requestBody);
-
-        $request = $this->makeRequest("POST", $url, $requestBody, $headers);
-        return $request;
-    }
 
     /**
      * Order Refunded
      * - flag order as being refunded
      * @param externalOrderId
      */
-      public function orderRefunded($externalOrderId)
-      {
-          if ($this->vToken === null) {
-              $this->login();
-          }
-
-          $url = $this->getApiPath() . sprintf(self::ORDER_REFUNDED_ENDPOINT, $this->merchantId, $externalOrderId);
-          $headers = self::assembleRequestHeaders();
-
-          $requestBody = json_encode([
-          "merchant_id" => $this->merchantId,
-          "order_id" => $externalOrderId
-          ]);
-
-          $request = $this->makeRequest("POST", $url, $requestBody, $headers);
-          return $request;
-      }
-
-  /**
-   * Set Merchant Credentials
-   * - persists merchant credentials to Violet
-   * @param accessToken
-   * @param secret
-   * @param verifier
-   */
-    public function setMerchantCredentials($accessToken, $secret, $verifier)
+    public function orderRefunded($externalOrderId)
     {
-        try {
-            if ($this->vToken === null) {
-                $this->login();
-            }
+        $url = $this->getApiPath() . self::ORDER_EVENT_ENDPOINT;
+        $headers = self::assembleRequestHeaders();
 
-            $bootstrap = Bootstrap::create(BP, $_SERVER);
-            $objectManager = $bootstrap->getObjectManager();
-            $storeManager = $objectManager->get('Magento\Store\Model\StoreManagerInterface');
+        $requestBody = json_encode([
+            "entity_id" => $externalOrderId,
+            "entity_type" => "ORDER",
+            "event_type" => "ORDER_REFUNDED"
+        ]);
 
-            // create token
-            $token = base64_encode(openssl_random_pseudo_bytes(30));
-            $tokenEncrypt = $this->encryptor->encrypt($token);
-
-            // load existing violet entity
-            $violetEntityModel = $this->violetEntityFactory->create();
-            $violetEntity = $violetEntityModel->load(1);
-
-            $merchantId = $this->scopeConfig->getValue(
-                'violet/general/violet_merchant_id',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-            );
-
-            // update violet entity with encrypted token and merchant ID
-            $violetEntity->setToken($tokenEncrypt)->setMerchantId((int)$merchantId)->save();
-
-            // define url
-            $url = $this->getApiPath() . sprintf(self::SET_CREDENTIALS_ENDPOINT, $merchantId);
-            $headers = self::assembleRequestHeaders();
-
-            $requestBody = json_encode(
-                [
-                "credential_part_one" => $accessToken,
-                "credential_part_two" => $secret,
-                "credential_part_three" => $verifier,
-                "credential_part_four" => $token,
-                "store_url" => $storeManager->getStore()->getBaseUrl(),
-                "platform" => "magento",
-                "merchant_id" => $merchantId
-                ]
-            );
-
-            $response = $this->makeRequest("POST", $url, $requestBody, $headers);
-
-            return $response;
-        } catch (\Exception $e) {
-            $this->logger->info("Violet merchant credentials creation failure: " . $e->getMessage());
-            $this->messageManager->addWarning(__(
-                "API User coult not be created or refreshed. " . $e->getMessage()
-            ));
-        }
+        $request = $this->makeRequest("POST", $url, $requestBody, $headers);
+        return $request;
     }
+
 
   /**
    * Make Request
@@ -399,6 +149,16 @@ class Client extends AbstractHelper
             if ($headers === null) {
                 $headers = ['Content-Type: application/json',"X-Violet-App-Id: -1"];
             }
+
+            // load existing violet entity
+            try {
+                $violetEntityModel = $this->violetEntityFactory->create();
+                $violetEntity = $violetEntityModel->load(1);
+                $merchantId = $violetEntity->getMerchantId();
+                if ($merchantId != null && $merchantId > 10000) {
+                    $headers[] = 'X-Violet-Merchant-Id: ' . $merchantId;
+                }
+            } catch (\Exception $ignore) {}
 
             // ititiate curl
             $ch = curl_init($url);
@@ -503,7 +263,6 @@ class Client extends AbstractHelper
     {
         return [
         "Content-Type: application/json",
-        "X-Violet-App-Id: -1",
         ];
     }
 

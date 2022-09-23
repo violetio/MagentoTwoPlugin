@@ -24,7 +24,6 @@ class Create extends \Magento\Framework\App\Action\Action implements HttpPostAct
     private $integrationName = 'Violet';
     private $integrationEmail = 'integrations@violet.io';
     private $vClient;
-    protected $scopeConfig;
 
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -98,23 +97,26 @@ class Create extends \Magento\Framework\App\Action\Action implements HttpPostAct
                   $uri = $token->createVerifierToken($consumerId);
                   $token->setType('access');
                   $token->save();
-
-                  $this->vClient->setMerchantCredentials(
-                      $token->getToken(),
-                      $token->getSecret(),
-                      $token->getVerifier()
-                  );
+     
             } catch (\Exception $e) {
                 // pass
             }
         } else {
-            // update credentials
             $token = $objectManager->get('Magento\Integration\Model\Oauth\Token');
-            $uri = $token->createVerifierToken($existingIntegration['consumer_id']);
-            $token->setType('access');
-            $token->save();
+            $token->loadByConsumerIdAndUserType($existingIntegration['consumer_id'], 1);
+            if ($token != null && !empty($token->getData())) {
+                $oauthHelper = $objectManager->get('Magento\Framework\Oauth\Helper\Oauth');
 
-            $this->vClient->setMerchantCredentials($token->getToken(), $token->getSecret(), $token->getVerifier());
+                $token->setToken($oauthHelper->generateToken());
+                $token->setSecret($oauthHelper->generateTokenSecret());
+                $token->setVerifier($oauthHelper->generateVerifier());
+                $token->save();
+            } else {
+                $token = $objectManager->get('Magento\Integration\Model\Oauth\Token');
+                $token->createVerifierToken($existingIntegration['consumer_id']);
+                $token->setType('access');
+                $token->save();
+            }
         }
     }
 

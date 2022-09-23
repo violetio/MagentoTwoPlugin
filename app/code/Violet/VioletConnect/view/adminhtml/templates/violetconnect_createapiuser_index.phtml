@@ -8,15 +8,57 @@
       <?php if (!$block->integrationExists()) : ?>
       <button id="violet-submit-btn" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" type="submit">
         <span class="ui-button-text">
-          <span>Create API User</span>
+          <span>Create API Credentials</span>
         </span>
       </button>
       <?php else : ?>
-        <button id="violet-submit-btn" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" type="submit">
+
+      <?php
+        $token = $block->getToken();
+      ?>
+      <div>
+        <div class="fieldset-wrapper-title">
+          <strong class="title">
+            <span>API Credentials</span>
+          </strong>
+        </div>
+        <div>
+          <div class="violet-credential-row">
+            <div>
+              <label for="api-token">
+                API Token
+              </label>
+            </div>
+            <input id="api-token" class="admin__control-text violet-api-credential" type="text" name="api-token" readonly="readonly" value="<?php echo $token->getToken(); ?>" />
+          </div>
+          <div class="violet-credential-row">
+            <div>
+              <label for="api-secret">
+                API Secret
+              </label>
+            </div>
+            <input class="admin__control-text violet-api-credential" type="text" name="api-secret" readonly="readonly" value="<?php echo $token->getSecret(); ?>" />
+          </div>
+          <div class="violet-credential-row">
+            <div>
+              <label for="api-verifier">
+                API Verifier
+              </label>
+            </div>
+            <input class="admin__control-text violet-api-credential" type="text" name="api-verifier" readonly="readonly" value="<?php echo $token->getVerifier(); ?>" />
+          </div>
+        </div>
+      </div>
+      
+      <div class="violet-api-credentials-refresh">
+        <div class="violet-refresh-notice"><span>Notice</span>: Refreshing your API credentials will break your connection to Violet until you provide the new credentials to Violet.<div>
+        <div class="violet-refresh-notice-input"><input type="checkbox" id="accept-refresh-clause" /> <span>I Understand</span></div>
+        <button disabled="disabled" id="violet-submit-btn" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" type="submit">
           <span class="ui-button-text">
-            <span>Refresh API User</span>
+            <span>Refresh API Credentials</span>
           </span>
         </button>
+      </div>
       <?php endif; ?>
     </form>
   </div>
@@ -25,21 +67,58 @@
     div.violet-content > div {
         margin-bottom: 15px;
     }
+    div.violet-credential-row {
+      margin-top: 12px;
+    }
+    input.violet-api-credential {
+      width: 400px;
+      color: #888;
+    }
+    div.violet-api-credentials-refresh {
+      border-top: 1px solid #ccc;
+      margin-top: 50px;
+      padding-top: 20px;
+    }
+    div.violet-refresh-notice  span {
+      font-weight: bold;
+    }
+    div.violet-refresh-notice-input {
+      margin: 10px 0;
+    }
+    div.violet-refresh-notice-input input {
+      cursor: pointer;
+    }
+    div.violet-refresh-notice-input span {
+      font-size: 12px;
+      line-height: 2px;
+      position: relative;
+      top: -2px;
+      left: 3px;
+    }
+
 </style>
 <script>
 require([
     "jquery"
 ], function($){
-    $('#form-manage-apiuser').submit(function(e){
-        $('#violet-submit-btn').prop('disabled', true);
-        $('#violet-submit-btn span span').text('Processing...');
-        e.preventDefault();
-        $.ajax({
-            url: e.originalEvent.srcElement.action,
-            type:'post'
-        }).done(function(m) {
-            location.reload();
-        });
-    });
+  $('#accept-refresh-clause').on('change', function() {
+    if($(this).prop('checked')) {
+      $('#violet-submit-btn').prop('disabled', false);
+    } else {
+      $('#violet-submit-btn').prop('disabled', true);
+    }
+  });
+
+  $('#form-manage-apiuser').submit(function(e){
+      $('#violet-submit-btn').prop('disabled', true);
+      $('#violet-submit-btn span span').text('Processing...');
+      e.preventDefault();
+      $.ajax({
+          url: e.originalEvent.srcElement.action,
+          type:'post'
+      }).done(function(m) {
+          location.reload();
+      });
+  });
 });
 </script>

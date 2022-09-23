@@ -3,25 +3,22 @@
     <event name="catalog_product_save_after">
         <observer name="product_update" instance="Violet\VioletConnect\Observer\ProductSaveAfter" />
     </event>
-    <event name="order_cancel_after">
-        <observer name="order_canceled" instance="Violet\VioletConnect\Observer\OrderCancelAfter" />
-    </event>
     <event name="cataloginventory_stock_item_save_commit_after">
         <observer name="stock_item_save_after" instance="Violet\VioletConnect\Observer\StockItemSaveAfter" />
     </event>
-    <event name="sales_model_service_quote_submit_before">
-        <observer name="sales_model_submit_before" instance="Violet\VioletConnect\Observer\SalesModelSubmitBefore" />
-    </event>
-    <event name="sales_model_service_quote_submit_failure">
-        <observer name="sales_model_submit_failure" instance="Violet\VioletConnect\Observer\SalesModelSubmitBefore" />
-    </event>
-    <event name="sales_order_item_cancel">
-        <observer name="sales_order_item_cancel" instance="Violet\VioletConnect\Observer\SalesOrderItemCancel" />
+    <event name="order_cancel_after">
+        <observer name="sales_order_cancel" instance="Violet\VioletConnect\Observer\SalesOrderCanceled" />
     </event>
     <event name="sales_order_creditmemo_save_after">
         <observer name="sales_order_credit_after" instance="Violet\VioletConnect\Observer\SalesOrderCreditAfter" />
     </event>
     <event name="checkout_submit_all_after">
         <observer name="sales_order_placed" instance="Violet\VioletConnect\Observer\SalesOrderPlaced" />
+    </event>
+    <event name="sales_order_creditmemo_refund">
+        <observer name="sales_order_refunded" instance="Violet\VioletConnect\Observer\SalesOrderRefunded" />
+    </event>
+    <event name="catalog_product_delete_after">
+        <observer name="product_deletion" instance="Violet\VioletConnect\Observer\ProductDeleteAfter" />
     </event>
 </config>

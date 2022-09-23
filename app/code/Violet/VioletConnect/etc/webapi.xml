@@ -1,14 +1,14 @@
 <?xml version="1.0" ?>
 
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
-    <route url="/V1/violet/validateAccount/" method="POST">
-        <service class="Violet\VioletConnect\Api\VioletRepositoryInterface" method="validateAccount"/>
+    <route url="/V1/violet/sku-children/:sku" method="GET">
+        <service class="Violet\VioletConnect\Api\VioletRepositoryInterface" method="skuChildren"/>
         <resources>
             <resource ref="Magento_Backend::admin"/>
         </resources>
     </route>
-    <route url="/V1/violet/sku-children/" method="GET">
-        <service class="Violet\VioletConnect\Api\VioletRepositoryInterface" method="skuChildren"/>
+    <route url="/V1/violet/sku-parent/:sku" method="GET">
+        <service class="Violet\VioletConnect\Api\VioletRepositoryInterface" method="skuParent"/>
         <resources>
             <resource ref="Magento_Backend::admin"/>
         </resources>
@@ -21,6 +21,24 @@
     </route>
     <route url="/V1/violet/skus/" method="GET">
         <service class="Violet\VioletConnect\Api\VioletRepositoryInterface" method="skus"/>
+        <resources>
+            <resource ref="Magento_Backend::admin"/>
+        </resources>
+    </route>
+    <route url="/V1/violet/orders/:orderId/" method="GET">
+        <service class="Violet\VioletConnect\Api\VioletRepositoryInterface" method="orderShipments"/>
+        <resources>
+            <resource ref="Magento_Backend::admin"/>
+        </resources>
+    </route>
+    <route url="/V1/violet/store_admin/" method="GET">
+        <service class="Violet\VioletConnect\Api\VioletRepositoryInterface" method="storeAdmin"/>
+        <resources>
+            <resource ref="Magento_Backend::admin"/>
+        </resources>
+    </route>
+    <route url="/V1/violet/configuration/" method="PUT">
+        <service class="Violet\VioletConnect\Api\VioletRepositoryInterface" method="violetConfiguration"/>
         <resources>
             <resource ref="Magento_Backend::admin"/>
         </resources>

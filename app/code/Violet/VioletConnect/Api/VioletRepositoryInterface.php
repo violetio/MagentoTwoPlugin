@@ -7,15 +7,6 @@ namespace Violet\VioletConnect\Api;
 interface VioletRepositoryInterface
 {
     /**
-     * 
-     * @param string $token
-     * @param int $merchantId
-     *
-     * @return Violet\VioletConnect\Model\Data\TokenValidation
-     */
-    public function validateAccount($token, $merchantId);
-
-    /**
      *
      * @return int
      */
@@ -37,4 +28,34 @@ interface VioletRepositoryInterface
      * @return Magento\Catalog\Api\Data\ProductInterface[]
      */
     public function skuChildren($sku);
+
+    /**
+     * 
+     * @param string $sku
+     *
+     * @return Magento\Catalog\Api\Data\ProductInterface
+     */
+    public function skuParent($sku);
+
+    /**
+     * 
+     * @param int $orderId
+     *
+     * @return Magento\Sales\Api\Data\ShipmentInterface[]
+     */
+    public function orderShipments($orderId);
+
+     /**
+     * 
+     * @return Violet\VioletConnect\Model\Data\StoreAdmin
+     */
+    public function storeAdmin();
+
+    /**
+     * 
+     * @param Violet\VioletConnect\Model\Data\VioletConfiguration $configuration
+     * 
+     * @return Violet\VioletConnect\Model\Data\VioletConfiguration
+     */
+    public function violetConfiguration($configuration);
 }

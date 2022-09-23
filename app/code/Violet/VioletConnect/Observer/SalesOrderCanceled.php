@@ -4,13 +4,13 @@ namespace Violet\VioletConnect\Observer;
 use Magento\Framework\Event\ObserverInterface;
 
 /**
- * Violet After Sales Order Credited Event
+ * Violet Sales Order Item Canceled Event
  *
  * @author     Rhen Zabel <rhen@violet.io>
  * @copyright  2017 Violet.io, Inc.
  * @since      1.0.1
  */
-class SalesOrderCreditAfter implements ObserverInterface
+class SalesOrderCanceled implements ObserverInterface
 {
 
     private $logger;
@@ -28,13 +28,17 @@ class SalesOrderCreditAfter implements ObserverInterface
     {
         try {
             $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-            $creditmemo = $observer->getEvent()->getCreditmemo();
-            if ($creditmemo == null) return;
-            foreach ($creditmemo->getAllItems() as $item) {
-                $this->vClient->productUpdated($item->getSku());
+
+            $order = $observer->getEvent()->getOrder();
+            if ($order == null) return;
+
+            foreach ($order->getAllItems() as $item) {
+                if ($item !== null && $item->getTypeId() != "configurable") {
+                    $this->vClient->productUpdated($item->getSku());
+                }
             }
         } catch (\Exception $e) {
-            $this->logger->info("Error notifying Violet of quanity update after credit memo: " . $e->getMessage());
+            $this->logger->info("Error in Sales Order Item Canceled: " . $e->getMessage());
         }
     }
 }

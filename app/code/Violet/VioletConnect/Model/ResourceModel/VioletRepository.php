@@ -5,7 +5,8 @@ use Violet\VioletConnect\Api\VioletRepositoryInterface;
 use Magento\Catalog\Model\CategoryFactory;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
 use Magento\Framework\App\ResourceConnectionFactory;
-use Violet\VioletConnect\Model\Data\TokenValidation;
+use Violet\VioletConnect\Model\Data\VioletConfiguration;
+use Violet\VioletConnect\Model\Data\StoreAdmin;
 
 /**
  * Violet VioletRepositoryInterface
@@ -71,27 +72,6 @@ class VioletRepository implements VioletRepositoryInterface
         $this->productCollectionFactory = $productCollectionFactory;
         $this->violetEntityFactory = $violetEntityFactory;
         $this->encryptor = $encryptor;
-    }
-
-    /**
-     * @api
-     *
-     * @param string $token
-     * @param int $merchantId
-     *
-     * @return \Violet\VioletConnect\Model\Data\TokenValidation
-     */
-    public function validateAccount($token, $merchantId)
-    {
-      // load existing violet entity
-        $violetEntityModel = $this->violetEntityFactory->create();
-        $violetEntity = $violetEntityModel->load(1);
-        $encryptedToken = $violetEntity->getToken();
-        $tokenActual = $this->encryptor->decrypt($encryptedToken);
-
-        $validation = new TokenValidation();
-        $validation->setValidated($token === $tokenActual);
-        return $validation;
     }
 
     /**
@@ -174,6 +154,126 @@ class VioletRepository implements VioletRepositoryInterface
         }
 
         return $products;
+    }
+
+    /**
+     * gets sku parent
+     *
+     * @api
+     *
+     * @param string $sku
+     *
+     * @return Magento\Catalog\Api\Data\ProductInterface
+     */
+    public function skuParent($sku)
+    {
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+
+        $childProduct = $this->loadProduct($sku);
+
+        $parentProductIds = $objectManager
+        ->create('Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable')
+        ->getParentIdsByChild($childProduct->getId());
+
+        // if parents exist
+        if (!empty($parentProductIds)) {
+            $parentProduct = $objectManager
+            ->create('Magento\Catalog\Model\Product')->load($parentProductIds[0]);
+            return $this->loadProduct($parentProduct->getSku());
+        } else {
+            return $childProduct;
+        }
+    }
+
+    /**
+     * get shipments of order
+     *
+     * @api
+     *
+     * @param int $orderId
+     *
+     * @return Magento\Sales\Api\Data\ShipmentInterface[]
+     */
+    public function orderShipments($orderId)
+    {
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+
+        $shipmentRepositoryInterface = $objectManager->get('Magento\Sales\Api\ShipmentRepositoryInterface');
+        $searchCriteriaBuilder = $objectManager->get('Magento\Framework\Api\SearchCriteriaBuilder');
+        $searchCriteria = $searchCriteriaBuilder->addFilter('order_id', $orderId)->create();
+
+        try {
+            $shipments = $shipmentRepositoryInterface->getList($searchCriteria);
+            return $shipments->getItems();
+        } catch (Exception $exception) {
+            $this->logger->critical($exception->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * @api
+     *
+     * @return \Violet\VioletConnect\Model\Data\StoreAdmin
+     */
+    public function storeAdmin()
+    {
+        try {
+            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+            $resource = $objectManager->get('Magento\Framework\App\ResourceConnection');
+            $connection = $resource->getConnection();
+            $tableName = $resource->getTableName('admin_user');
+
+            $sqlQuery = "select * from " . $tableName . " where is_active = 1 limit 1";
+            $results = $connection->fetchAll($sqlQuery);
+            $adminResult = $results[0];
+        
+            $admin = new StoreAdmin($results);
+            $admin->setEmailAddress($adminResult['email']);
+            $admin->setFirstName($adminResult['firstname']);
+            $admin->setLastName($adminResult['lastname']);
+    
+            return $admin;
+
+        } catch (Exception $exception) {
+            $logger->critical($exception->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * @api
+     * 
+     * @param \Violet\VioletConnect\Model\Data\VioletConfiguration $config
+     *
+     * @return \Violet\VioletConnect\Model\Data\VioletConfiguration
+     */
+    public function violetConfiguration($configuration)
+    {
+        try {
+            // load existing violet entity
+            $violetEntityModel = $this->violetEntityFactory->create();
+            $violetEntity = $violetEntityModel->load(1);
+
+            if (!empty($configuration->getMerchantId())) {
+                $violetEntity->setMerchantId($configuration->getMerchantId());
+            }
+
+            if (!empty($configuration->getToken())) {
+                $violetEntity->setToken($this->encryptor->encrypt($configuration->getToken()));
+            }
+
+            $violetEntity->save();
+
+            $configRes = new VioletConfiguration();
+            $configRes->setMerchantId($violetEntity->getMerchantId());
+            $configRes->setToken($violetEntity->getToken());
+            return $configRes;
+
+        } catch (Exception $exception) {
+            $logger->critical($exception->getMessage());
+            return null;
+        }
     }
 
     /**

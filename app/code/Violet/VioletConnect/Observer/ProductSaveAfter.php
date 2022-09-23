@@ -34,52 +34,35 @@ class ProductSaveAfter implements ObserverInterface
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
-      try{
-        // product being updated
-        $mageProduct = $observer->getProduct();
-        // object manager
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        // outgoing request wrapper
+        try{
+            // product being updated
+            $mageProduct = $observer->getProduct();
 
-        $this->vClient->login();
+            // object manager
+            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 
-        $productWrapper = [
-            'product' => [
-                'sku' => $mageProduct->getSku()
-            ],
-            'timestamp' => time()
-        ];
+            $productId = $mageProduct->getSku();
 
-        if ($productWrapper === null) {
-            return;
-        }
-        $productsToSync = [];
+            // handle hidden product
+            if ($mageProduct->getTypeId() == "simple" && $mageProduct->getVisibility() == 1) {
+                // collect parent ids
+                $parentProductIds = $objectManager
+                ->create('Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable')
+                ->getParentIdsByChild($mageProduct->getId());
 
-        // handle hidden product
-        if ($mageProduct->getTypeId() == "simple" && $mageProduct->getVisibility() == 1) {
-            // collect parent ids
-            $parentProductIds = $objectManager
-            ->create('Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable')
-            ->getParentIdsByChild($mageProduct->getId());
+                // if parents exist
+                if (!empty($parentProductIds)) {
+                    $parentProduct = $objectManager
+                    ->create('Magento\Catalog\Model\Product')->load($parentProductIds[0]);
 
-            // if parents exist, iterate
-            if (!empty($parentProductIds)) {
-                $parentProduct = $objectManager
-                ->create('Magento\Catalog\Model\Product')->load($parentProductIds[0]);
-
-                $productWrapper['product']['parent_sku'] = $parentProduct->getSku();
-                $productsToSync[] = $productWrapper;
-
-                // sync skus
-                $this->vClient->syncSkus($productsToSync);
+                    $productId = $parentProduct->getSku();
+                }
             }
-            // handle all other products
-        } else {
-            $productsToSync[] = $productWrapper;
-            $this->vClient->syncProducts($productsToSync);
+
+            $this->vClient->productUpdated($productId);
+
+        } catch (\Exception $e) {
+            $this->logger->info("Error notifying Violet of product update: " . $e->getMessage());
         }
-      } catch (\Exception $e) {
-          $this->logger->info("Error notifying Violet of product update.");
-      }
     }
 }

@@ -27,6 +27,8 @@ class Index extends \Magento\Backend\Block\Widget\Container
 
     public function getToken() 
     {
+        $bootstrap = Bootstrap::create(BP, $_SERVER);
+        $objectManager = $bootstrap->getObjectManager();
         $existingIntegration = $this->getExistingIntegration();
         $token = $objectManager->get('Magento\Integration\Model\Oauth\Token');
         $token->loadByConsumerIdAndUserType($existingIntegration['consumer_id'], 1);

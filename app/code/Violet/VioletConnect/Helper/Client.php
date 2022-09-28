@@ -127,6 +127,7 @@ class Client extends AbstractHelper
             "entity_type" => "ORDER",
             "event_type" => "ORDER_REFUNDED"
         ]);
+        $headers[] = 'X-Violet-Hmac-Sha256: ' . $this->signRequest($requestBody);
 
         $request = $this->makeRequest("POST", $url, $requestBody, $headers);
         return $request;

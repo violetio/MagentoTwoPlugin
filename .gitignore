@@ -1,2 +1,3 @@
 .DS_Store
 app/code/Violet/VioletConnect/vendor
+*.zip

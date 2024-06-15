@@ -43,4 +43,10 @@
             <resource ref="Magento_Backend::admin"/>
         </resources>
     </route>
+    <route url="/V1/violet/configuration/" method="GET">
+        <service class="Violet\VioletConnect\Api\VioletRepositoryInterface" method="getVioletConfiguration"/>
+        <resources>
+            <resource ref="Magento_Backend::admin"/>
+        </resources>
+    </route>
 </routes>

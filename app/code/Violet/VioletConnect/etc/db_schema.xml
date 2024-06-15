@@ -7,6 +7,9 @@
         <column xsi:type="text" name="token" nullable="true"/>
         <column xsi:type="bigint" name="merchant_id" nullable="true"/>
         <column xsi:type="datetime" name="last_catalog_sync_date" nullable="true"/>
+        <column xsi:type="boolean" name="product_update_webhooks_enabled" nullable="false" default="true"/>
+        <column xsi:type="boolean" name="product_delete_webhooks_enabled" nullable="false" default="true"/>
+        <column xsi:type="boolean" name="order_webhooks_enabled" nullable="false" default="true"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="id"/>
         </constraint>

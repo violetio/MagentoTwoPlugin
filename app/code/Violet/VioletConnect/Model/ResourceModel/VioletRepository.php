@@ -263,11 +263,52 @@ class VioletRepository implements VioletRepositoryInterface
                 $violetEntity->setToken($this->encryptor->encrypt($configuration->getToken()));
             }
 
+            if (!is_null($configuration->getProductUpdateWebhooksEnabled())) {
+                $violetEntity->setProductUpdateWebhooksEnabled($configuration->getProductUpdateWebhooksEnabled());
+            }
+
+            if (!is_null($configuration->getProductDeleteWebhooksEnabled())) {
+                $violetEntity->setProductDeleteWebhooksEnabled($configuration->getProductDeleteWebhooksEnabled());
+            }
+
+            if (!is_null($configuration->getOrderWebhooksEnabled())) {
+                $violetEntity->setOrderWebhooksEnabled($configuration->getOrderWebhooksEnabled());
+            }
+
             $violetEntity->save();
 
             $configRes = new VioletConfiguration();
             $configRes->setMerchantId($violetEntity->getMerchantId());
             $configRes->setToken($violetEntity->getToken());
+            $configRes->setProductUpdateWebhooksEnabled($violetEntity->getProductUpdateWebhooksEnabled());
+            $configRes->setProductDeleteWebhooksEnabled($violetEntity->getProductDeleteWebhooksEnabled());
+            $configRes->setOrderWebhooksEnabled($violetEntity->getOrderWebhooksEnabled());
+            return $configRes;
+
+        } catch (Exception $exception) {
+            $logger->critical($exception->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * @api
+     *
+     * @return \Violet\VioletConnect\Model\Data\VioletConfiguration
+     */
+    public function getVioletConfiguration()
+    {
+        try {
+            // load existing violet entity
+            $violetEntityModel = $this->violetEntityFactory->create();
+            $violetEntity = $violetEntityModel->load(1);
+
+            $configRes = new VioletConfiguration();
+            $configRes->setMerchantId($violetEntity->getMerchantId());
+            $configRes->setToken($violetEntity->getToken());
+            $configRes->setProductUpdateWebhooksEnabled($violetEntity->getProductUpdateWebhooksEnabled());
+            $configRes->setProductDeleteWebhooksEnabled($violetEntity->getProductDeleteWebhooksEnabled());
+            $configRes->setOrderWebhooksEnabled($violetEntity->getOrderWebhooksEnabled());
             return $configRes;
 
         } catch (Exception $exception) {

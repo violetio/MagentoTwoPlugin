@@ -17,7 +17,19 @@ class VioletConfiguration
   /**
    * @var string
    */
-  private $token;
+    private $token;
+  /**
+   * @var bool
+   */
+   private $productUpdateWebhooksEnabled;
+  /**
+   * @var bool
+   */
+   private $productDeleteWebhooksEnabled;
+  /**
+   * @var bool
+   */
+  private $orderWebhooksEnabled;
 
   /**
    * @return int
@@ -43,11 +55,59 @@ class VioletConfiguration
         return $this->token;
     }
 
-    /**
-     * @return null
-     */
+   /**
+    * @return null
+    */
     public function setToken($token)
     {
         $this->token = $token;
+    }
+
+   /**
+    * @return bool
+    */
+    public function getProductUpdateWebhooksEnabled()
+    {
+        return $this->productUpdateWebhooksEnabled;
+    }
+
+   /**
+    * @return null
+    */
+    public function setProductUpdateWebhooksEnabled($enabled)
+    {
+        $this->productUpdateWebhooksEnabled = $enabled;
+    }
+
+   /**
+    * @return bool
+    */
+    public function getProductDeleteWebhooksEnabled()
+    {
+        return $this->productDeleteWebhooksEnabled;
+    }
+
+   /**
+    * @return null
+    */
+    public function setProductDeleteWebhooksEnabled($enabled)
+    {
+        $this->productDeleteWebhooksEnabled = $enabled;
+    }
+
+   /**
+    * @return bool
+    */
+    public function getOrderWebhooksEnabled()
+    {
+        return $this->orderWebhooksEnabled;
+    }
+
+   /**
+    * @return null
+    */
+    public function setOrderWebhooksEnabled($enabled)
+    {
+        $this->orderWebhooksEnabled = $enabled;
     }
 }

@@ -24,6 +24,7 @@ class Create extends \Magento\Framework\App\Action\Action implements HttpPostAct
     private $integrationName = 'Violet';
     private $integrationEmail = 'integrations@violet.io';
     private $vClient;
+    private $scopeConfig;
 
     public function __construct(
         \Magento\Framework\App\Action\Context $context,

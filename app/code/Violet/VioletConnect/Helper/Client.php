@@ -62,7 +62,7 @@ class Client extends AbstractHelper
 
       $headers[] = 'X-Violet-Hmac-Sha256: ' . $this->signRequest($requestBody);
 
-      $request = $this->makeRequest("POST", $url, $requestBody, $headers);
+      $request = $this->makeRequest("POST", $url, $requestBody, $headers, "PRODUCT_UPDATED");
       return $request;
   }
 
@@ -83,7 +83,7 @@ class Client extends AbstractHelper
 
       $headers[] = 'X-Violet-Hmac-Sha256: ' . $this->signRequest($requestBody);
 
-      $request = $this->makeRequest("POST", $url, $requestBody, $headers);
+      $request = $this->makeRequest("POST", $url, $requestBody, $headers, "PRODUCT_DELETED");
       return $request;
   }
 
@@ -107,7 +107,7 @@ class Client extends AbstractHelper
         ]);
         $headers[] = 'X-Violet-Hmac-Sha256: ' . $this->signRequest($requestBody);
 
-        $request = $this->makeRequest("POST", $url, $requestBody, $headers);
+        $request = $this->makeRequest("POST", $url, $requestBody, $headers, "ORDER_UPDATED");
         return $request;
     }
 
@@ -129,7 +129,7 @@ class Client extends AbstractHelper
         ]);
         $headers[] = 'X-Violet-Hmac-Sha256: ' . $this->signRequest($requestBody);
 
-        $request = $this->makeRequest("POST", $url, $requestBody, $headers);
+        $request = $this->makeRequest("POST", $url, $requestBody, $headers, "ORDER_UPDATED");
         return $request;
     }
 
@@ -142,7 +142,7 @@ class Client extends AbstractHelper
    * @param body
    * @param headers
    */
-    private function makeRequest($method, $url, $body = null, $headers = null)
+    private function makeRequest($method, $url, $body = null, $headers = null, $genericEventType = null)
     {
         try {
             ob_start();
@@ -156,9 +156,27 @@ class Client extends AbstractHelper
                 $violetEntityModel = $this->violetEntityFactory->create();
                 $violetEntity = $violetEntityModel->load(1);
                 $merchantId = $violetEntity->getMerchantId();
+
                 if ($merchantId != null && $merchantId > 10000) {
                     $headers[] = 'X-Violet-Merchant-Id: ' . $merchantId;
                 }
+                
+                // account for webhook enable/disable status
+                if (!empty($genericEventType)) {
+                    // escape the event if product update webhooks are not enabled
+                    if ($genericEventType == "PRODUCT_UPDATED" && !$violetEntity->getProductUpdateWebhooksEnabled()) {
+                        return null;
+                    }
+                    // escape the event if product delete webhooks are not enabled
+                    elseif ($genericEventType == "PRODUCT_DELETED" && !$violetEntity->getProductDeleteWebhooksEnabled()) {
+                        return null;
+                    }
+                    // escape the event if order update webhooks are not enabled
+                    elseif ($genericEventType == "ORDER_UPDATED" && !$violetEntity->getOrderWebhooksEnabled()) {
+                        return null;
+                    }
+                }
+
             } catch (\Exception $ignore) {}
 
             // ititiate curl

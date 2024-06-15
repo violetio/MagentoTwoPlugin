@@ -3,7 +3,7 @@
     To access product data and persist orders back into your Magento store Violet requires an API User for Violet use only.
   </div>
   <div>
-    <form id="form-manage-apiuser" action="<?php echo $block->getAction() ?>" method="POST">
+    <form id="form-manage-apiuser" action="<?php echo $block->escapeUrl($block->getAction()) ?>" method="POST">
       <input name="form_key" type="hidden" value="<?php /* @escapeNotVerified */ echo $block->getFormKey() ?>" />
       <?php if (!$block->integrationExists()) : ?>
       <button id="violet-submit-btn" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" type="submit">
@@ -29,7 +29,7 @@
                 API Token
               </label>
             </div>
-            <input id="api-token" class="admin__control-text violet-api-credential" type="text" name="api-token" readonly="readonly" value="<?php echo $token->getToken(); ?>" />
+            <input id="api-token" class="admin__control-text violet-api-credential" type="text" name="api-token" readonly="readonly" value="<?php echo $block->escapeHtml($token->getToken()); ?>" />
           </div>
           <div class="violet-credential-row">
             <div>
@@ -37,7 +37,7 @@
                 API Secret
               </label>
             </div>
-            <input class="admin__control-text violet-api-credential" type="text" name="api-secret" readonly="readonly" value="<?php echo $token->getSecret(); ?>" />
+            <input class="admin__control-text violet-api-credential" type="text" name="api-secret" readonly="readonly" value="<?php echo $block->escapeHtml($token->getSecret()); ?>" />
           </div>
         </div>
       </div>

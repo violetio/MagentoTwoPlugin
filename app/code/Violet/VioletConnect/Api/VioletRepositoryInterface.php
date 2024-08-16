@@ -58,4 +58,10 @@ interface VioletRepositoryInterface
      * @return Violet\VioletConnect\Model\Data\VioletConfiguration
      */
     public function violetConfiguration($configuration);
+
+    /**
+     * 
+     * @return Violet\VioletConnect\Model\Data\VioletConfiguration
+     */
+    public function getVioletConfiguration();
 }

@@ -1,4 +1,10 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
   <preference for="Violet\VioletConnect\Api\VioletRepositoryInterface" type="Violet\VioletConnect\Model\ResourceModel\VioletRepository" />
+  <preference for="Violet\VioletConnect\Api\VioletGuestCartItemRepositoryInterface" type="Violet\VioletConnect\Model\ResourceModel\VioletGuestCartItemRepository" />
+  <preference for="Violet\VioletConnect\Api\VioletGuestCartTotalRepositoryInterface" type="Violet\VioletConnect\Model\ResourceModel\VioletGuestCartTotalRepository" />
+  <preference for="Violet\VioletConnect\Api\VioletGuestBillingAddressRepositoryInterface" type="Violet\VioletConnect\Model\ResourceModel\VioletGuestBillingAddressRepository" />
+  <preference for="Violet\VioletConnect\Api\VioletGuestShippingInformationRepositoryInterface" type="Violet\VioletConnect\Model\ResourceModel\VioletGuestShippingInformationRepository" />
+  <preference for="Violet\VioletConnect\Api\VioletGuestCartRepositoryInterface" type="Violet\VioletConnect\Model\ResourceModel\VioletGuestCartRepository" />
+  <preference for="Violet\VioletConnect\Api\VioletOrderRepositoryInterface" type="Violet\VioletConnect\Model\ResourceModel\VioletOrderRepository" />
 </config>

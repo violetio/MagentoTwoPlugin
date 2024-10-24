@@ -8,7 +8,6 @@ use Magento\Framework\Setup\Patch\DataPatchInterface;
 /**
  * Violet Install Data
  *
- * @author     Rhen Zabel <rhen@violet.io>
  * @copyright  2022 Violet.io, Inc.
  * @since      1.0.7
  *
@@ -39,17 +38,16 @@ class InstallSetup implements SchemaPatchInterface, DataPatchInterface
         $this->moduleDataSetup->startSetup();
 
         $cols = [
-                [
-                    'api_user_created' => false,
-                    'configuration_state' => 1
-                ]
-            ];
+            [
+                'api_user_created' => false,
+                'configuration_state' => 1
+            ]
+        ];
 
-            foreach ($cols as $col) {
-                $this->moduleDataSetup->getConnection()
-                ->insertForce($this->moduleDataSetup->getTable('violetconnect'), $col);
-            }
-
+        foreach ($cols as $col) {
+            $this->moduleDataSetup->getConnection()
+            ->insertForce($this->moduleDataSetup->getTable('violetconnect'), $col);
+        }
 
         $this->moduleDataSetup->endSetup();
     }

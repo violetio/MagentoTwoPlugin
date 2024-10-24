@@ -4,7 +4,6 @@ namespace Violet\VioletConnect\Model\Data;
 /**
  * Violet Admin User Model
  *
- * @author     Rhen Zabel <rhen@violet.io>
  * @copyright  2022 Violet.io, Inc.
  * @since      1.1.0
  */

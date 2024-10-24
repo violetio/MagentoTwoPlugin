@@ -49,4 +49,52 @@
             <resource ref="Magento_Backend::admin"/>
         </resources>
     </route>
+    <route url="/V1/violet/guest-carts/:cartId/items" method="POST">
+        <service class="Violet\VioletConnect\Api\VioletGuestCartItemRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="Magento_Backend::admin"/>
+        </resources>
+    </route>
+    <route url="/V1/violet/guest-carts/:cartId/items/:itemId" method="PUT">
+        <service class="Violet\VioletConnect\Api\VioletGuestCartItemRepositoryInterface" method="save"/>
+        <resources>
+           <resource ref="Magento_Backend::admin"/>
+        </resources>
+    </route>
+    <route url="/V1/violet/guest-carts/:cartId/totals" method="GET">
+        <service class="Violet\VioletConnect\Api\VioletGuestCartTotalRepositoryInterface" method="get"/>
+        <resources>
+            <resource ref="Magento_Backend::admin"/>
+        </resources>
+    </route>
+    <route url="/V1/violet/guest-carts/:cartId/billing-address" method="POST">
+        <service class="Violet\VioletConnect\Api\VioletGuestBillingAddressRepositoryInterface" method="assign"/>
+        <resources>
+            <resource ref="Magento_Backend::admin"/>
+        </resources>
+    </route>
+    <route url="/V1/violet/guest-carts/:cartId/shipping-information" method="POST">
+        <service class="Violet\VioletConnect\Api\VioletGuestShippingInformationRepositoryInterface" method="saveAddressInformation"/>
+        <resources>
+            <resource ref="Magento_Backend::admin"/>
+        </resources>
+    </route>
+    <route url="/V1/violet/guest-carts/:cartId/order" method="PUT">
+        <service class="Violet\VioletConnect\Api\VioletGuestCartRepositoryInterface" method="placeOrder"/>
+        <resources>
+            <resource ref="Magento_Backend::admin"/>
+        </resources>
+    </route>
+     <route url="/V1/violet/guest-carts" method="POST">
+        <service class="Violet\VioletConnect\Api\VioletGuestCartRepositoryInterface" method="createInitializedCart"/>
+        <resources>
+            <resource ref="Magento_Backend::admin"/>
+        </resources>
+    </route>
+    <route url="/V1/violet/guest-carts/calculate" method="POST">
+        <service class="Violet\VioletConnect\Api\VioletGuestCartTotalRepositoryInterface" method="calculate"/>
+        <resources>
+            <resource ref="Magento_Backend::admin"/>
+        </resources>
+    </route>
 </routes>

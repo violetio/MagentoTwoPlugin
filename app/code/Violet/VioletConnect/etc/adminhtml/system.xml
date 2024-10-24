@@ -62,8 +62,6 @@
                     <comment>Override the default API path. (Advanced)</comment>
                 </field>
             </group>
-
         </section>
-
     </system>
 </config>

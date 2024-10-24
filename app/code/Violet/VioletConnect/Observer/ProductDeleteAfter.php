@@ -6,7 +6,6 @@ use Magento\Framework\Event\ObserverInterface;
 /**
  * Violet After Product Delete Event
  *
- * @author     Rhen Zabel <rhen@violet.io>
  * @copyright  2022 Violet.io, Inc.
  * @since      1.1.0
  */
@@ -14,11 +13,11 @@ class ProductDeleteAfter implements ObserverInterface
 {
     /**
      * @var LoggerInterface
-    */
+     */
     private $logger;
     /**
      * @var Client
-    */
+     */
     private $vClient;
 
     public function __construct(

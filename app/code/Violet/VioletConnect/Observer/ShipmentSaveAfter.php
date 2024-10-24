@@ -7,7 +7,6 @@ use Magento\Sales\Api\Data\ShipmentItemInterface;
 /**
  * Violet After Shipment Save Event
  *
- * @author     Rhen Zabel <rhen@violet.io>
  * @copyright  2017 Violet.io, Inc.
  * @since      1.0.1
  */

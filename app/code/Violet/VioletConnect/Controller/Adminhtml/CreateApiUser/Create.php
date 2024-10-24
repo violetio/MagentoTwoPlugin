@@ -15,7 +15,6 @@ use Magento\Framework\App\CsrfAwareActionInterface;
  * create and authorizes Violet REST API User then
  * notifies Violet of credentials
  *
- * @author     Rhen Zabel <rhen@violet.io>
  * @copyright  2018 Violet.io, Inc.
  * @since      1.0.1
  */

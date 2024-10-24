@@ -6,7 +6,6 @@ use Magento\Framework\Event\ObserverInterface;
 /**
  * Violet After Item Save Event
  *
- * @author     Rhen Zabel <rhen@violet.io>
  * @copyright  2017 Violet.io, Inc.
  * @since      1.0.1
  */

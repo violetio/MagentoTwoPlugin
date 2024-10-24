@@ -21,4 +21,7 @@
     <event name="catalog_product_delete_after">
         <observer name="product_deletion" instance="Violet\VioletConnect\Observer\ProductDeleteAfter" />
     </event>
+    <event name="sales_order_place_before">
+        <observer name="before_sales_order_placed" instance="Violet\VioletConnect\Observer\BeforeSalesOrderPlaced" />
+    </event>
 </config>

@@ -4,7 +4,6 @@ namespace Violet\VioletConnect\Model\Data;
 /**
  * Violet Store Configuration Model
  *
- * @author     Rhen Zabel <rhen@violet.io>
  * @copyright  2017 Violet.io, Inc.
  * @since      1.0.1
  */

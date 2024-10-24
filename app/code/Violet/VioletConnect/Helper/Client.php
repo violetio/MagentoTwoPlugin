@@ -7,7 +7,6 @@ use \Magento\Framework\App\Bootstrap;
 /**
  * Violet Client
  *
- * @author     Rhen Zabel <rhen@violet.io>
  * @copyright  2017 Violet.io, Inc.
  * @since      1.0.1
  */
@@ -25,8 +24,8 @@ class Client extends AbstractHelper
     private $violetEntityFactory;
     private $curl;
 
-    const PRODUCT_EVENT_ENDPOINT = "sync/external/events/magento/product";
-    const ORDER_EVENT_ENDPOINT = "sync/external/events/magento/order";
+    public const PRODUCT_EVENT_ENDPOINT = "sync/external/events/magento/product";
+    public const ORDER_EVENT_ENDPOINT = "sync/external/events/magento/order";
 
     public function __construct(
         \Psr\Log\LoggerInterface $logger,
@@ -44,57 +43,56 @@ class Client extends AbstractHelper
         $this->violetEntityFactory = $violetEntityFactory;
     }
 
- 
-  /**
-   * Product Updated
-   * @param externalId
-   */
-  public function productUpdated($externalId)
-  {
-      $url = $this->getApiPath() . self::PRODUCT_EVENT_ENDPOINT;
-      $headers = self::assembleRequestHeaders();
+    /**
+     * Product Updated
+     * @param externalId
+     */
+    public function productUpdated($externalId)
+    {
+        $url = $this->getApiPath() . self::PRODUCT_EVENT_ENDPOINT;
+        $headers = self::assembleRequestHeaders();
 
-      $requestBody = json_encode([
-        "entity_id" => $externalId,
-        "entity_type" => "PRODUCT",
-        "event_type" => "PRODUCT_UPDATED"
-      ]);
+        $requestBody = json_encode([
+            "entity_id" => $externalId,
+            "entity_type" => "PRODUCT",
+            "event_type" => "PRODUCT_UPDATED"
+        ]);
 
-      $headers[] = 'X-Violet-Hmac-Sha256: ' . $this->signRequest($requestBody);
+        $headers[] = 'X-Violet-Hmac-Sha256: ' . $this->signRequest($requestBody);
 
-      $request = $this->makeRequest("POST", $url, $requestBody, $headers, "PRODUCT_UPDATED");
-      return $request;
-  }
+        $request = $this->makeRequest("POST", $url, $requestBody, $headers, "PRODUCT_UPDATED");
+        return $request;
+    }
 
-  /**
-   * Product Deleted
-   * @param externalId
-   */
-  public function productDeleted($externalId)
-  {
-      $url = $this->getApiPath() . self::PRODUCT_EVENT_ENDPOINT;
-      $headers = self::assembleRequestHeaders();
+    /**
+     * Product Deleted
+     * @param externalId
+     */
+    public function productDeleted($externalId)
+    {
+        $url = $this->getApiPath() . self::PRODUCT_EVENT_ENDPOINT;
+        $headers = self::assembleRequestHeaders();
 
-      $requestBody = json_encode([
-        "entity_id" => $externalId,
-        "entity_type" => "PRODUCT",
-        "event_type" => "PRODUCT_DELETED"
-      ]);
+        $requestBody = json_encode([
+            "entity_id" => $externalId,
+            "entity_type" => "PRODUCT",
+            "event_type" => "PRODUCT_DELETED"
+        ]);
 
-      $headers[] = 'X-Violet-Hmac-Sha256: ' . $this->signRequest($requestBody);
+        $headers[] = 'X-Violet-Hmac-Sha256: ' . $this->signRequest($requestBody);
 
-      $request = $this->makeRequest("POST", $url, $requestBody, $headers, "PRODUCT_DELETED");
-      return $request;
-  }
+        $request = $this->makeRequest("POST", $url, $requestBody, $headers, "PRODUCT_DELETED");
+        return $request;
+    }
 
 
-  /**
-   * Order Shipped
-   * - flag order as being shipping and provide tracking number
-   * @param externalOrderId
-   * @param trackingId
-   * @param carrierName
-   */
+    /**
+     * Order Shipped
+     * - flag order as being shipping and provide tracking number
+     * @param externalOrderId
+     * @param trackingId
+     * @param carrierName
+     */
     public function orderShipped($externalOrderId)
     {
         $url = $this->getApiPath() . self::ORDER_EVENT_ENDPOINT;
@@ -223,30 +221,30 @@ class Client extends AbstractHelper
 
 
     /**
-  * Sign Request
-  * @param object $requestBody
-  */
-  private function signRequest($requestBody)
-  {
-    try {
-      // load existing violet entity
-      $violetEntityModel = $this->violetEntityFactory->create();
-      $violetEntity = $violetEntityModel->load(1);
+     * Sign Request
+     * @param object $requestBody
+     */
+    private function signRequest($requestBody)
+    {
+        try {
+        // load existing violet entity
+        $violetEntityModel = $this->violetEntityFactory->create();
+        $violetEntity = $violetEntityModel->load(1);
 
-      // update violet entity with encrypted token and merchant ID
-      $tokenDecrypt = $this->encryptor->decrypt($violetEntity->getToken());
-      $hmac = base64_encode(hash_hmac("sha256", $requestBody, $tokenDecrypt, true));
-      return $hmac;
-    } catch (\Exception $e) {
-        return null;
+        // update violet entity with encrypted token and merchant ID
+        $tokenDecrypt = $this->encryptor->decrypt($violetEntity->getToken());
+        $hmac = base64_encode(hash_hmac("sha256", $requestBody, $tokenDecrypt, true));
+        return $hmac;
+        } catch (\Exception $e) {
+            return null;
+        }
     }
-  }
 
-  /**
-   * Get Headers Array
-   * Converts the header data into an array
-   * @param response
-   */
+    /**
+     * Get Headers Array
+     * Converts the header data into an array
+     * @param response
+     */
     private function getHeadersAsArray($response)
     {
         $headers = [];
@@ -262,11 +260,11 @@ class Client extends AbstractHelper
         return $headers;
     }
 
-  /**
-   * Get Response Header
-   * - returns header value at given index
-   * @param key
-   */
+    /**
+     * Get Response Header
+     * - returns header value at given index
+     * @param key
+     */
     private function getResponseHeader($key)
     {
         if (array_key_exists($key, $this->headerArray)) {
@@ -275,9 +273,9 @@ class Client extends AbstractHelper
         return null;
     }
 
-  /**
-   * Assemble Request Headers
-   */
+    /**
+     * Assemble Request Headers
+     */
     private function assembleRequestHeaders()
     {
         return [
@@ -285,9 +283,9 @@ class Client extends AbstractHelper
         ];
     }
 
-  /**
-   * Get Violet API Path
-   */
+    /**
+     * Get Violet API Path
+     */
     private function getApiPath()
     {
         $testMode = $this->scopeConfig->getValue(
@@ -302,7 +300,7 @@ class Client extends AbstractHelper
 
         if ($pathOverride !== null && strlen($pathOverride) >= 1) {
             return $pathOverride;
-        } else if ($testMode !== '0') {
+        } elseif ($testMode !== '0') {
             return 'https://sandbox-api.violet.io/v1/';
         } else {
             return 'https://api.violet.io/v1/';

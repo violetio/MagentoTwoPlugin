@@ -7,7 +7,6 @@ use Magento\Sales\Model\Order;
 /**
  * Violet After Order Placed
  *
- * @author     Rhen Zabel <rhen@violet.io>
  * @copyright  2019 Violet.io, Inc.
  * @since      1.0.3
  */

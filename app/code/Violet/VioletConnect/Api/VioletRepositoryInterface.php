@@ -16,7 +16,6 @@ interface VioletRepositoryInterface
      * 
      * @param int $page
      * @param int $pageSize
-     *
      * @return Magento\Catalog\Api\Data\ProductInterface[]
      */
     public function skus($page, $pageSize);
@@ -24,7 +23,6 @@ interface VioletRepositoryInterface
     /**
      * 
      * @param string $sku
-     *
      * @return Magento\Catalog\Api\Data\ProductInterface[]
      */
     public function skuChildren($sku);
@@ -32,7 +30,6 @@ interface VioletRepositoryInterface
     /**
      * 
      * @param string $sku
-     *
      * @return Magento\Catalog\Api\Data\ProductInterface
      */
     public function skuParent($sku);
@@ -40,7 +37,6 @@ interface VioletRepositoryInterface
     /**
      * 
      * @param int $orderId
-     *
      * @return Magento\Sales\Api\Data\ShipmentInterface[]
      */
     public function orderShipments($orderId);
@@ -54,8 +50,13 @@ interface VioletRepositoryInterface
     /**
      * 
      * @param Violet\VioletConnect\Model\Data\VioletConfiguration $configuration
-     * 
      * @return Violet\VioletConnect\Model\Data\VioletConfiguration
      */
     public function violetConfiguration($configuration);
+
+    /**
+     * 
+     * @return Violet\VioletConnect\Model\Data\VioletConfiguration
+     */
+    public function getVioletConfiguration();
 }

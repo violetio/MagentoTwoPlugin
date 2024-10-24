@@ -4,7 +4,6 @@ namespace Violet\VioletConnect\Model\Data;
 /**
  * Violet Admin User Model
  *
- * @author     Rhen Zabel <rhen@violet.io>
  * @copyright  2022 Violet.io, Inc.
  * @since      1.1.0
  */
@@ -30,6 +29,10 @@ class VioletConfiguration
    * @var bool
    */
   private $orderWebhooksEnabled;
+  /**
+   * @var string
+   */
+  private $pluginVersion;
 
   /**
    * @return int
@@ -109,5 +112,13 @@ class VioletConfiguration
     public function setOrderWebhooksEnabled($enabled)
     {
         $this->orderWebhooksEnabled = $enabled;
+    }
+
+    /**
+    * @return string
+    */
+    public function getPluginVersion()
+    {
+        return "1.2.0";
     }
 }

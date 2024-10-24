@@ -13,7 +13,6 @@
                 <model>Violet\VioletConnect\Model\Violet</model>
                 <group>offline</group>
             </violet>
-            <!-- payment-config -->
         </payment>
     </default>
 </config>

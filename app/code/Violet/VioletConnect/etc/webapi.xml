@@ -85,14 +85,26 @@
             <resource ref="Magento_Backend::admin"/>
         </resources>
     </route>
-     <route url="/V1/violet/guest-carts" method="POST">
-        <service class="Violet\VioletConnect\Api\VioletGuestCartRepositoryInterface" method="createInitializedCart"/>
+    <route url="/V1/violet/guest-carts" method="POST">
+        <service class="Violet\VioletConnect\Api\VioletOrderRepositoryInterface" method="createInitializedCart"/>
+        <resources>
+            <resource ref="Magento_Backend::admin"/>
+        </resources>
+    </route>
+    <route url="/V1/violet/guest-carts/:cartId" method="DELETE">
+        <service class="Violet\VioletConnect\Api\VioletGuestCartRepositoryInterface" method="deleteCart"/>
         <resources>
             <resource ref="Magento_Backend::admin"/>
         </resources>
     </route>
     <route url="/V1/violet/guest-carts/calculate" method="POST">
         <service class="Violet\VioletConnect\Api\VioletGuestCartTotalRepositoryInterface" method="calculate"/>
+        <resources>
+            <resource ref="Magento_Backend::admin"/>
+        </resources>
+    </route>
+    <route url="/V1/violet/orders" method="POST">
+        <service class="Violet\VioletConnect\Api\VioletOrderRepositoryInterface" method="createOrder"/>
         <resources>
             <resource ref="Magento_Backend::admin"/>
         </resources>

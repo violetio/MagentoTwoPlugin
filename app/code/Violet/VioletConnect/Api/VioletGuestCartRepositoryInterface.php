@@ -10,15 +10,6 @@ use Violet\VioletConnect\Model\Data\VioletCart;
 interface VioletGuestCartRepositoryInterface
 {
     /**
-     * Create an optionally initialized cart
-     *
-     * @param VioletCart $violetCart
-     * @throws \Magento\Framework\Exception\CouldNotSaveException The cart and quote could not be created.
-     * @return string Cart ID.
-     */
-    public function createInitializedCart(\Violet\VioletConnect\Model\Data\VioletCart $violetCart);
-
-    /**
      * Place an order for a specified cart.
      *
      * @param string $cartId The cart ID.
@@ -27,4 +18,13 @@ interface VioletGuestCartRepositoryInterface
      * @return int Order ID.
      */
     public function placeOrder($cartId, PaymentInterface $paymentMethod = null);
+
+    /**
+     * Deletes a Guest Cart
+     *
+     * @param string $cartId The cart ID.
+     * @throws \Magento\Framework\Exception\CouldNotSaveException
+     * @return int Cart ID.
+     */
+    public function deleteCart($cartId);
 }
